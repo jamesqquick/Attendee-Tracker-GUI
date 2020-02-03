@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { withRouter } from 'react-router';
-import { authenticationService } from '../utils/Auth';
 
 const AttendeesList = ({ attendees }) => {
     return (

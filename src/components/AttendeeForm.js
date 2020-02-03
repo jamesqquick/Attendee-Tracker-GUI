@@ -1,5 +1,4 @@
 import React from 'react';
-import { authenticationService } from '../utils/Auth';
 
 export default function AttendeeForm() {
     const [name, setName] = React.useState('');

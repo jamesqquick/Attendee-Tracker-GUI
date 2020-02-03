@@ -1,5 +1,4 @@
 import React from 'react';
-import { authenticationService } from '../utils/Auth';
 export default function EventForm(props) {
     const [title, setTitle] = React.useState('');
     const [description, setDescription] = React.useState('');
@@ -11,14 +10,11 @@ export default function EventForm(props) {
         console.log('Submitting', title, description, date, location);
         e.preventDefault();
         setLoading(true);
-        const event = { title, description, date, location };
+        //const event = { title, description, date, location };
         try {
-            const res = await authenticationService.fetchWithAuthHeader(
-                '/api/events',
-                { method: 'POST', body: JSON.stringify(event) }
-            );
-            const eventId = res._id;
-            props.history.push(`/event/${eventId}`);
+            //TODO get id
+            //const eventId = res._id;
+            //props.history.push(`/event/${eventId}`);
             setLoading(false);
         } catch (err) {
             console.error(err);

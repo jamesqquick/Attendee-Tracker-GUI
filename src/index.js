@@ -1,27 +1,34 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import { Route, BrowserRouter as Router } from 'react-router-dom';
-import Home from './components/pages/Home';
-import LoginPage from './components/pages/LoginPage';
-import RegisterPage from './components/pages/RegisterPage';
-import ProtectedRoute from './components/Auth/ProtectedRoute';
-import Logout from './components/Auth/Logout';
-import Event from './components/pages/Event';
-import MyEvents from './components/pages/MyEvents';
+import App from './App';
+
+import { Auth0Provider } from './utils/Auth';
+import history from './utils/History';
+
+const onRedirectCallback = (appState) => {
+    history.push(
+        appState && appState.targetUrl
+            ? appState.targetUrl
+            : window.location.pathname
+    );
+};
+
 const routing = (
-    <Router>
-        <div className="container">
-            <Route path="/" exact component={Home} />
-            <Route path="/login" component={LoginPage} />
-            <Route path="/register" component={RegisterPage} />
-            <ProtectedRoute path="/logout" component={Logout} />
-            <Route path="/event/:eventId" component={Event} />
-            <ProtectedRoute path="/myEvents" component={MyEvents} />
-        </div>
-    </Router>
+    <Fragment>
+        <Auth0Provider
+            domain={process.env.REACT_APP_AUTH0_DOMAIN}
+            client_id={process.env.REACT_APP_AUTH0_CLIENT_ID}
+            redirect_uri={window.location.origin}
+            onRedirectCallback={onRedirectCallback}
+            audience={process.env.REACT_APP_AUTH0_AUDIENCE}
+        >
+            <App />
+        </Auth0Provider>
+    </Fragment>
 );
+
 ReactDOM.render(routing, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import AttendeeList from '../AttendeeList';
-import AttendeeForm from '../AttendeeForm';
-import { authenticationService } from '../../utils//Auth';
+import AttendeeList from '../components/AttendeeList';
+import AttendeeForm from '../components/AttendeeForm';
+import { useAuth0 } from '../utils/Auth';
 
 export default function Event(props) {
     const { params } = props.match;
@@ -9,18 +9,12 @@ export default function Event(props) {
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     //use the user to register or not
-    const user = authenticationService.getUser();
+    const { user } = useAuth0();
 
     useEffect(() => {
         async function fetchEvent() {
             try {
-                const res = await authenticationService.fetchWithAuthHeader(
-                    `/api/events/${params.eventId}`,
-                    {
-                        method: 'GET'
-                    }
-                );
-                setEvent(res);
+                //TODO: load event
                 setLoading(false);
             } catch (err) {
                 console.error(err);

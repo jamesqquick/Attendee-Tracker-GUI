@@ -1,61 +1,70 @@
-import decode from 'jwt-decode';
+import React, { useState, useEffect, useContext } from 'react';
+import createAuth0client from '@auth0/auth0-spa-js';
 
-const saveToken = (token) => {
-    localStorage.setItem('user_token', token);
+const DEFAULT_REDIRECT_CALLBACK = () => {
+    window.history.replaceState({}, document.title, window.location.pathname);
 };
 
-const isLoggedIn = () => {
-    //TODO: can check for expiration
-    return !!localStorage.getItem('user_token');
-};
+export const Auth0Context = React.createContext();
+export const useAuth0 = () => useContext(Auth0Context);
 
-const logout = () => {
-    localStorage.removeItem('user_token');
-};
+export const Auth0Provider = ({
+    children,
+    onRedirectCallback = DEFAULT_REDIRECT_CALLBACK,
+    ...initOptions
+}) => {
+    const [isAuthenticated, setIsAuthenticated] = useState();
+    const [user, setUser] = useState();
+    const [auth0Client, setAuth0Client] = useState();
+    const [loading, setLoading] = useState(true);
 
-const getToken = () => {
-    return localStorage.getItem('user_token');
-};
+    useEffect(() => {
+        const initAuth0 = async () => {
+            const auth0FromHook = await createAuth0client(initOptions);
+            console.log(auth0FromHook);
+            setAuth0Client(auth0FromHook);
 
-const getUser = () => {
-    try {
-        return decode(getToken());
-    } catch (err) {
-        return null;
-    }
-};
+            if (
+                window.location.search.includes('code=') &&
+                window.location.search.includes('state=')
+            ) {
+                const {
+                    appState
+                } = await auth0FromHook.handleRedirectCallback();
+                onRedirectCallback(appState);
+            }
 
-const fetchWithAuthHeader = async (url, options) => {
-    const headers = {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-    };
+            const isAuthenticated = await auth0FromHook.isAuthenticated();
+            setIsAuthenticated(isAuthenticated);
 
-    if (isLoggedIn()) {
-        headers['Authorization'] = 'Bearer ' + getToken();
-    }
+            if (isAuthenticated) {
+                const user = await auth0FromHook.getUser();
+                setUser(user);
+            }
 
-    const res = await fetch(url, {
-        headers,
-        ...options
-    });
-    checkStatus(res);
-    return await res.json(); //will either return or throw error based on status
-};
+            setLoading(false);
+        };
 
-const checkStatus = (response) => {
-    if (!(response.status >= 200 && response.status < 300)) {
-        const error = new Error(response.statusText);
-        error.response = response;
-        throw error;
-    }
-};
+        initAuth0();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-export const authenticationService = {
-    saveToken,
-    isLoggedIn,
-    logout,
-    getToken,
-    getUser,
-    fetchWithAuthHeader
+    return (
+        <Auth0Context.Provider
+            value={{
+                loading,
+                isAuthenticated,
+                user,
+                getIdTokenClaims: (...p) => auth0Client.getIdTokenClaims(...p),
+                loginWithRedirect: (...p) =>
+                    auth0Client.loginWithRedirect(...p),
+                getTokenSilently: (...p) => auth0Client.getTokenSilently(...p),
+                getTokenWithPopup: (...p) =>
+                    auth0Client.getTokenWithPopup(...p),
+                logout: (...p) => auth0Client.logout(...p)
+            }}
+        >
+            {children}
+        </Auth0Context.Provider>
+    );
 };
