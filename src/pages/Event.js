@@ -8,20 +8,28 @@ export default function Event(props) {
     console.log(params);
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
-    //use the user to register or not
-    const { user } = useAuth0();
+    //if user owns the event, show edit abilities
+    const { user, getTokenSilently } = useAuth0();
 
     useEffect(() => {
         async function fetchEvent() {
             try {
-                //TODO: load event
+                const token = await getTokenSilently();
+                const response = await fetch('', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                console.log(response);
+                const responseData = await response.json();
+                setEvent(responseData);
                 setLoading(false);
             } catch (err) {
                 console.error(err);
             }
         }
         fetchEvent();
-    }, [params.eventId]);
+    }, [getTokenSilently, params.eventId]);
 
     return (
         <div>

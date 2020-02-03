@@ -1,20 +1,30 @@
 import React from 'react';
+import { useAuth0 } from '../utils/Auth';
 export default function EventForm(props) {
     const [title, setTitle] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [date, setDate] = React.useState('');
     const [location, setLocation] = React.useState('');
     const [loading, setLoading] = React.useState(false);
+    const { user, getTokenSilently } = useAuth0();
 
     const handleSubmit = async (e) => {
-        console.log('Submitting', title, description, date, location);
         e.preventDefault();
         setLoading(true);
-        //const event = { title, description, date, location };
+        const event = { title, description, date, location };
         try {
-            //TODO get id
-            //const eventId = res._id;
-            //props.history.push(`/event/${eventId}`);
+            const token = await getTokenSilently();
+            event.user = token.sub;
+            const response = await fetch('', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(event)
+            });
+            const responseData = await response.json();
+            const eventId = responseData._id;
+            props.history.push(`/event/${eventId}`);
             setLoading(false);
         } catch (err) {
             console.error(err);

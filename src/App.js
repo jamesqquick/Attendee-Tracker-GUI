@@ -9,8 +9,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Event from './pages/Event';
 import MyEvents from './pages/MyEvents';
 function App() {
-    const { loading } = useAuth0();
-
+    const { loading, user } = useAuth0();
+    console.log(user);
     if (loading) {
         return <div>Loading...</div>;
     }
