@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Route } from 'react-router-dom';
-import { useAuth0 } from '../utils/Auth';
+import { useAuth0 } from '../utils/Auth0';
 
 const ProtectedRoute = ({ component: Component, path, ...rest }) => {
     const { isAuthenticated, loading, loginWithRedirect } = useAuth0();

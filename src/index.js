@@ -4,7 +4,7 @@ import './index.css';
 import * as serviceWorker from './serviceWorker';
 import App from './App';
 
-import { Auth0Provider } from './utils/Auth';
+import { Auth0Provider } from './utils/Auth0';
 import history from './utils/History';
 
 const onRedirectCallback = (appState) => {

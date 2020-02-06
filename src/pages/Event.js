@@ -1,35 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import AttendeeList from '../components/AttendeeList';
-import AttendeeForm from '../components/AttendeeForm';
-import { useAuth0 } from '../utils/Auth';
+import GuestRSVPForm from '../components/GuestRSVPForm';
+import { useAuth0 } from '../utils/Auth0';
 
 export default function Event(props) {
     const { params } = props.match;
-    console.log(params);
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
-    //if user owns the event, show edit abilities
     const { user, getTokenSilently } = useAuth0();
+
+    //TODO: if user owns the event, show edit abilities
+    //TODO: render two different types ->  editable, and registerable
+    //If not logged in, then allow anonymous submission
 
     useEffect(() => {
         async function fetchEvent() {
             try {
-                const token = await getTokenSilently();
-                const response = await fetch('', {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+                const headers = {};
+                if (user) {
+                    const token = await getTokenSilently();
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+                console.log(params.eventId);
+                const response = await fetch(`/api/events/${params.eventId}`, {
+                    method: 'GET',
+                    headers
                 });
-                console.log(response);
-                const responseData = await response.json();
-                setEvent(responseData);
+                const event = await response.json();
+                setEvent(event);
                 setLoading(false);
             } catch (err) {
                 console.error(err);
+                setLoading(false);
             }
         }
         fetchEvent();
-    }, [getTokenSilently, params.eventId]);
+    }, [getTokenSilently, params.eventId, user]);
 
     return (
         <div>
@@ -38,7 +44,10 @@ export default function Event(props) {
             ) : (
                 <>
                     <h1>{event.title}</h1>
-                    <AttendeeForm eventId={event.eventId} />
+                    <p>{event.description}</p>
+                    <p>{event.location}</p>
+                    <p>{event.date}</p>
+                    {!user && <GuestRSVPForm eventId={event._id} />}
                     <AttendeeList attendees={event.attendees} />
                 </>
             )}

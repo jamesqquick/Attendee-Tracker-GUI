@@ -3,14 +3,13 @@ import './App.css';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import NotFound from './pages/NotFound';
-import { useAuth0 } from './utils/Auth';
+import { useAuth0 } from './utils/Auth0';
 import Home from './pages/Home';
 import ProtectedRoute from './components/ProtectedRoute';
 import Event from './pages/Event';
 import MyEvents from './pages/MyEvents';
 function App() {
     const { loading, user } = useAuth0();
-    console.log(user);
     if (loading) {
         return <div>Loading...</div>;
     }

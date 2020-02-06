@@ -1,8 +1,9 @@
 import React from 'react';
 
-export default function AttendeeForm() {
+export default function GuestRSVPForm({ eventId }) {
+    console.log(eventId);
     const [name, setName] = React.useState('');
-    const [email, setEmail] = React.useState(0);
+    const [email, setEmail] = React.useState('');
 
     const reset = () => {
         setEmail(0);
@@ -11,9 +12,16 @@ export default function AttendeeForm() {
 
     const submitAttendee = async (e) => {
         e.preventDefault();
-        const attendee = { name, email };
         try {
-            console.log(attendee);
+            const attendee = { name, email };
+            const response = await fetch(`/api/events/${eventId}/rsvp`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(attendee)
+            });
+            const responseData = await response.json();
             reset();
         } catch (err) {
             console.error(err);
@@ -37,7 +45,7 @@ export default function AttendeeForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 ></input>
-                <button type="submit">Submit</button>
+                <button type="submit">RSVP</button>
             </form>
         </div>
     );

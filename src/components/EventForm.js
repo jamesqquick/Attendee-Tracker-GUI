@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth0 } from '../utils/Auth';
+import { useAuth0 } from '../utils/Auth0';
 export default function EventForm(props) {
     const [title, setTitle] = React.useState('');
     const [description, setDescription] = React.useState('');
@@ -15,21 +15,29 @@ export default function EventForm(props) {
         try {
             const token = await getTokenSilently();
             event.user = token.sub;
-            const response = await fetch('', {
+            const response = await fetch('/api/events', {
                 method: 'POST',
                 headers: {
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(event)
             });
             const responseData = await response.json();
             const eventId = responseData._id;
-            props.history.push(`/event/${eventId}`);
+            //history.push(`/event/${eventId}`);
+            resetForm();
             setLoading(false);
         } catch (err) {
             console.error(err);
             setLoading(false);
         }
+    };
+
+    const resetForm = () => {
+        setTitle('');
+        setDescription('');
+        setDate('');
     };
 
     return (

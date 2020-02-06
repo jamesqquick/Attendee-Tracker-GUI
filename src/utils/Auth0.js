@@ -21,7 +21,6 @@ export const Auth0Provider = ({
     useEffect(() => {
         const initAuth0 = async () => {
             const auth0FromHook = await createAuth0client(initOptions);
-            console.log(auth0FromHook);
             setAuth0Client(auth0FromHook);
 
             if (

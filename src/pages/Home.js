@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import EventForm from '../components/EventForm';
-import { useAuth0 } from '../utils/Auth';
+import { useAuth0 } from '../utils/Auth0';
+import EventCard from '../components/EventCard';
 export default function Home(props) {
     const { user } = useAuth0();
     const [events, setEvents] = useState(null);
@@ -9,9 +10,12 @@ export default function Home(props) {
     useEffect(() => {
         async function fetchEvents() {
             try {
-                const response = await fetch('');
-                const events = await response.json();
-                setEvents(events);
+                const response = await fetch('/api/events', {
+                    method: 'GET'
+                });
+                const eventsData = await response.json();
+                setEvents(eventsData);
+                console.log(eventsData);
                 setLoading(false);
             } catch (err) {
                 console.error(err);
@@ -22,14 +26,12 @@ export default function Home(props) {
     return (
         <div>
             <h1>Welcome to Attendee Tracker</h1>
-            {user && <EventForm history={props.history} />}
+            {user && <EventForm />}
             {/* search events */}
-            {/* display events */}
+            <h2>Recent Events</h2>
             {events &&
                 events.map((event) => (
-                    <div key={event.id}>
-                        <p>event</p>
-                    </div>
+                    <EventCard key={event._id} event={event}></EventCard>
                 ))}
         </div>
     );
