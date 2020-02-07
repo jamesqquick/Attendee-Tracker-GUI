@@ -1,5 +1,7 @@
 import React from 'react';
 import { useAuth0 } from '../utils/Auth0';
+import history from '../utils/History';
+
 export default function EventForm(props) {
     const [title, setTitle] = React.useState('');
     const [description, setDescription] = React.useState('');
@@ -25,9 +27,10 @@ export default function EventForm(props) {
             });
             const responseData = await response.json();
             const eventId = responseData._id;
-            //history.push(`/event/${eventId}`);
+            console.log('submitted');
             resetForm();
             setLoading(false);
+            history.push(`/event/${eventId}`);
         } catch (err) {
             console.error(err);
             setLoading(false);

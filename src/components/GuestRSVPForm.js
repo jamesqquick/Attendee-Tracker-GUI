@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function GuestRSVPForm({ eventId }) {
+export default function GuestRSVPForm({ eventId, rsvpCompleted }) {
     console.log(eventId);
     const [name, setName] = React.useState('');
     const [email, setEmail] = React.useState('');
@@ -23,6 +23,7 @@ export default function GuestRSVPForm({ eventId }) {
             });
             const responseData = await response.json();
             reset();
+            rsvpCompleted();
         } catch (err) {
             console.error(err);
         }
